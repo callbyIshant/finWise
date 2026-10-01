@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Pocket Clear</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f0d">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <span class="logo-text">Pocket Clear</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-link active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="transactions.html" class="nav-link"><i data-lucide="arrow-left-right"></i> Money In & Out</a>
+        <a href="reports.html" class="nav-link"><i data-lucide="pie-chart"></i> Visual Trends</a>
+        <a href="rates.html" class="nav-link"><i data-lucide="globe"></i> Exchange Rates</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-ghost" style="width: 100%;"><i data-lucide="log-out"></i> Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" id="hamburger" aria-label="Toggle menu"><i data-lucide="menu"></i></button>
+          <div class="user-info" id="user-greeting">Welcome back</div>
+        </div>
+        <div class="topbar-right" style="display: flex; align-items: center; gap: 10px;">
+          <div class="sync-status-pill status-online" title="Sync Status">
+            <span class="status-dot"></span>
+            <span>Synced</span>
+          </div>
+          <button class="btn btn-ghost btn-privacy-toggle" title="Privacy Shield Mode" style="padding: 6px;">
+            <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="FinancialCalculators.openCalculatorsModal()" style="display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="calculator" style="width: 14px; height: 14px;"></i> Calculators
+          </button>
+          <div class="topbar-badge">
+            <span class="pulse"></span> 100% Private · Zero Ads
+          </div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="dashboard-header">
+          <div>
+            <h1>Overview</h1>
+            <p>Know where your money goes. <em>One glance, no spreadsheets.</em></p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" onclick="CategoryBudgets.openBudgetModal(window.cachedCategories)">
+              <i data-lucide="sliders"></i> Budgets
+            </button>
+            <a href="transactions.html" class="btn btn-primary"><i data-lucide="plus"></i> Quick Entry</a>
+          </div>
+        </div>
+        
+        <div class="stat-grid">
+          <div class="card stat-card card-balance">
+            <div class="stat-header">
+              <span class="stat-title">Net Cash Flow</span>
+              <div class="stat-icon"><i data-lucide="wallet"></i></div>
+            </div>
+            <div class="stat-value" id="stat-balance">₹0.00</div>
+            <div class="stat-change" id="stat-balance-sub">Current period balance</div>
+          </div>
+
+          <div class="card stat-card card-income">
+            <div class="stat-header">
+              <span class="stat-title">Money In (Income)</span>
+              <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+            </div>
+            <div class="stat-value" id="stat-income" style="color: var(--income);">₹0.00</div>
+            <div class="stat-change positive">Total earnings</div>
+          </div>
+
+          <div class="card stat-card card-expense">
+            <div class="stat-header">
+              <span class="stat-title">Money Out (Spend)</span>
+              <div class="stat-icon"><i data-lucide="trending-down"></i></div>
+            </div>
+            <div class="stat-value" id="stat-expense" style="color: var(--expense);">₹0.00</div>
+            <div class="stat-change negative">Total expenses</div>
+          </div>
+
+          <div class="card stat-card card-count">
+            <div class="stat-header">
+              <span class="stat-title">Total Entries</span>
+              <div class="stat-icon"><i data-lucide="receipt"></i></div>
+            </div>
+            <div class="stat-value" id="stat-tx-count">0</div>
+            <div class="stat-change">Transactions logged</div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="card">
+            <div class="chart-card-header">
+              <h3 style="font-size: 1.15rem;">Spending by Category</h3>
+              <span class="badge badge-tag">This Month</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="category-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="chart-card-header">
+              <h3 style="font-size: 1.15rem;">6-Month Cash Flow</h3>
+              <span class="badge badge-tag">Trends</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="trend-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pocket Clear Category Budgets Card -->
+        <div class="card" style="margin-bottom: var(--space-6);">
+          <div class="chart-card-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 style="font-size: 1.15rem;">Monthly Category Budgets</h3>
+              <span class="badge badge-tag">Health Limits</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="CategoryBudgets.openBudgetModal(window.cachedCategories)">
+              <i data-lucide="sliders" style="width: 14px; height: 14px;"></i> Set Limits
+            </button>
+          </div>
+          <div id="dashboard-budgets-container">
+            <p style="color: var(--text-muted); font-size: 13px;">Loading budgets...</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="chart-card-header">
+            <h3 style="font-size: 1.15rem;">Recent Activity</h3>
+            <a href="transactions.html" style="font-size: var(--font-size-xs); font-weight: 600;">View all →</a>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="recent-tx-body">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Loading transactions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/offline-sync.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/budgets.js"></script>
+  <script src="assets/js/calculators.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

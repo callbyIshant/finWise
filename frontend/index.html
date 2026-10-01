@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pocket Clear — Simple Free Expense Tracker. No Ads, No Bank Linking</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f0d">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+
+  <div class="auth-page">
+    <div class="auth-left">
+      <div class="hero-badges-wrapper">
+        <div class="hero-pill">
+          <span class="stars">★★★★★</span> 4.9 App Store · 4.7 Google Play
+        </div>
+        <div class="hero-pill">
+          <span class="pulse"></span> 40,000+ Users
+        </div>
+        <div class="hero-pill">
+          🔒 100% Private
+        </div>
+      </div>
+
+      <h1 class="auth-hero-title">
+        The 5-second<br>
+        <em>expense tracker.</em><br>
+        Free. No ads. No bank linking.
+      </h1>
+
+      <p class="auth-hero-subtitle">
+        Money in, money out, done. Log a spend in two taps and finally see where your money goes. Distraction-free personal finance.
+      </p>
+
+      <div class="feature-checkmarks">
+        <div class="check-item">
+          <i data-lucide="check"></i>
+          <span>5-second rapid entry</span>
+        </div>
+        <div class="check-item">
+          <i data-lucide="check"></i>
+          <span>Zero ads — forever</span>
+        </div>
+        <div class="check-item">
+          <i data-lucide="check"></i>
+          <span>No bank login needed</span>
+        </div>
+        <div class="check-item">
+          <i data-lucide="check"></i>
+          <span>Visual cash flow & trends</span>
+        </div>
+        <div class="check-item">
+          <i data-lucide="check"></i>
+          <span>Customizable categories</span>
+        </div>
+        <div class="check-item">
+          <i data-lucide="check"></i>
+          <span>Live currency conversion</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="auth-right">
+      <div class="auth-box">
+        <div class="auth-box-header">
+          <div class="logo-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <h2>Pocket Clear</h2>
+          <p>Sign in to your private financial tracker</p>
+        </div>
+
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tab-login">Sign In</div>
+          <div class="auth-tab" id="tab-register">Register</div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="form-login" class="auth-form active">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="login-email" class="form-control" placeholder="name@domain.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-control" placeholder="Enter password" required>
+          </div>
+          <div id="login-error" class="error-msg"></div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+          
+          <div style="text-align: center; margin-top: 1.25rem; font-size: var(--font-size-xs); color: var(--text-muted);">
+            Don't have an account? <a href="#" id="link-register" style="font-weight: 600;">Create one free</a>
+          </div>
+        </form>
+
+        <!-- Register Form -->
+        <form id="form-register" class="auth-form">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="reg-fullname" class="form-control" placeholder="e.g. Alex Morgan" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" id="reg-username" class="form-control" placeholder="alex_m" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="alex@domain.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-control" placeholder="Min 8 chars, 1 upper, 1 digit" required>
+            <div class="password-strength">
+              <div></div><div></div><div></div><div></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" id="reg-confirm-password" class="form-control" placeholder="Re-type password" required>
+          </div>
+          <div id="reg-error" class="error-msg"></div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Start Free Tracking</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    lucide.createIcons();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(console.warn);
+    }
+  </script>
+</body>
+</html>

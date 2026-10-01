@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exchange Rates — Pocket Clear</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f0d">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <span class="logo-text">Pocket Clear</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="transactions.html" class="nav-link"><i data-lucide="arrow-left-right"></i> Money In & Out</a>
+        <a href="reports.html" class="nav-link"><i data-lucide="pie-chart"></i> Visual Trends</a>
+        <a href="rates.html" class="nav-link active"><i data-lucide="globe"></i> Exchange Rates</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-ghost" style="width: 100%;"><i data-lucide="log-out"></i> Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" id="hamburger" aria-label="Toggle menu"><i data-lucide="menu"></i></button>
+          <div class="user-info" id="user-greeting">Welcome back</div>
+        </div>
+        <div class="topbar-right" style="display: flex; align-items: center; gap: 10px;">
+          <div class="sync-status-pill status-online" title="Sync Status">
+            <span class="status-dot"></span>
+            <span>Synced</span>
+          </div>
+          <button class="btn btn-ghost btn-privacy-toggle" title="Privacy Shield Mode" style="padding: 6px;">
+            <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+          </button>
+          <div class="topbar-badge">
+            <span class="pulse"></span> 135 Currencies Supported
+          </div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="dashboard-header">
+          <div>
+            <h1>Live Exchange Rates</h1>
+            <p>Real-time foreign exchange vs USD. <em>Clean client-side conversion.</em></p>
+            <div id="last-updated" style="color: var(--text-muted); font-size: var(--font-size-xs); margin-top: var(--space-2);">
+              Last updated: fetching...
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-secondary" id="btn-refresh"><i data-lucide="refresh-cw"></i> Refresh Rates</button>
+          </div>
+        </div>
+
+        <div class="rates-grid" id="rates-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="converter-widget">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6);">
+            <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: var(--space-2);">
+              <i data-lucide="calculator" style="color: var(--accent);"></i> Currency Converter
+            </h3>
+            <span class="badge badge-tag">Instant Client-side</span>
+          </div>
+
+          <div class="converter-row">
+            <div style="flex: 1;">
+              <label class="form-label">Amount (USD)</label>
+              <input type="number" id="conv-amount" class="form-control" value="100" min="0" step="any" style="font-size: 1.15rem; font-family: var(--font-serif);">
+            </div>
+            <div style="flex: 1;">
+              <label class="form-label">Convert Target</label>
+              <select id="conv-currency" class="form-control" style="font-size: 1rem;">
+                <!-- Populated by JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="converter-result">
+            <div class="converter-result-label">Converted Amount</div>
+            <div class="converter-result-value" id="conv-result">0.00</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/offline-sync.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/rates.js"></script>
+</body>
+</html>

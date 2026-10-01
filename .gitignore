@@ -1,0 +1,25 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local financial data and test artifacts
+*.db
+*.sqlite
+*.sqlite3
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Python environments and caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Editors and OS files
+.DS_Store
+Thumbs.db
+.vscode/

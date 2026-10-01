@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Trends — Pocket Clear</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f0d">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <span class="logo-text">Pocket Clear</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="transactions.html" class="nav-link"><i data-lucide="arrow-left-right"></i> Money In & Out</a>
+        <a href="reports.html" class="nav-link active"><i data-lucide="pie-chart"></i> Visual Trends</a>
+        <a href="rates.html" class="nav-link"><i data-lucide="globe"></i> Exchange Rates</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-ghost" style="width: 100%;"><i data-lucide="log-out"></i> Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" id="hamburger" aria-label="Toggle menu"><i data-lucide="menu"></i></button>
+          <div class="user-info" id="user-greeting">Welcome back</div>
+        </div>
+        <div class="topbar-right" style="display: flex; align-items: center; gap: 10px;">
+          <div class="sync-status-pill status-online" title="Sync Status">
+            <span class="status-dot"></span>
+            <span>Synced</span>
+          </div>
+          <button class="btn btn-ghost btn-privacy-toggle" title="Privacy Shield Mode" style="padding: 6px;">
+            <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+          </button>
+          <div class="topbar-badge">
+            <span class="pulse"></span> Visual Reports & Charts
+          </div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="dashboard-header" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h1>Visual Trends</h1>
+            <p>Where your money went. <em>Clear insights into your cash flow.</em></p>
+          </div>
+          <div>
+            <button class="btn btn-secondary btn-sm" onclick="DataTransfer.exportData('csv')"><i data-lucide="download"></i> Export CSV</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--space-8);">
+          <div class="filter-bar" style="margin-bottom: 0; background: transparent; padding: 0; border: none;">
+            <select class="form-control" id="date-preset" style="min-width: 170px;">
+              <option value="this_month">This Month</option>
+              <option value="last_month">Last Month</option>
+              <option value="last_3">Last 3 Months</option>
+              <option value="last_6">Last 6 Months</option>
+              <option value="this_year">This Year</option>
+            </select>
+            <span style="color: var(--text-muted); font-size: var(--font-size-xs); font-weight: 500;">OR RANGE:</span>
+            <input type="date" class="form-control" id="start-date">
+            <span style="color: var(--text-muted); font-size: var(--font-size-xs);">TO</span>
+            <input type="date" class="form-control" id="end-date">
+            <button class="btn btn-primary" id="apply-dates"><i data-lucide="refresh-cw"></i> Update View</button>
+          </div>
+        </div>
+        
+        <div class="stat-grid">
+          <div class="card stat-card card-balance">
+            <div class="stat-header">
+              <span class="stat-title">Period Net</span>
+              <div class="stat-icon"><i data-lucide="scale"></i></div>
+            </div>
+            <div class="stat-value" id="rep-balance">₹0.00</div>
+            <div class="stat-change">Net savings this period</div>
+          </div>
+
+          <div class="card stat-card card-income">
+            <div class="stat-header">
+              <span class="stat-title">Period Income</span>
+              <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+            </div>
+            <div class="stat-value" id="rep-income" style="color: var(--income);">₹0.00</div>
+            <div class="stat-change positive">Money collected</div>
+          </div>
+
+          <div class="card stat-card card-expense">
+            <div class="stat-header">
+              <span class="stat-title">Period Expenses</span>
+              <div class="stat-icon"><i data-lucide="trending-down"></i></div>
+            </div>
+            <div class="stat-value" id="rep-expense" style="color: var(--expense);">₹0.00</div>
+            <div class="stat-change negative">Money spent</div>
+          </div>
+
+          <div class="card stat-card card-count">
+            <div class="stat-header">
+              <span class="stat-title">Entries Logged</span>
+              <div class="stat-icon"><i data-lucide="file-text"></i></div>
+            </div>
+            <div class="stat-value" id="rep-tx-count">0</div>
+            <div class="stat-change">Total records in range</div>
+          </div>
+        </div>
+
+        <div class="charts-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="card">
+            <div class="chart-card-header">
+              <h3 style="font-size: 1.15rem;">Spending by Category</h3>
+              <span class="badge badge-tag">Share of Total</span>
+            </div>
+            <div class="chart-container" style="height: 340px;">
+              <canvas id="rep-category-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="chart-card-header">
+              <h3 style="font-size: 1.15rem;">Income vs. Expenses</h3>
+              <span class="badge badge-tag">Monthly Trend</span>
+            </div>
+            <div class="chart-container" style="height: 340px;">
+              <canvas id="rep-trend-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="chart-card-header">
+            <div>
+              <h3 style="font-size: 1.15rem;">Daily Spending Heatmap</h3>
+              <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: 2px;">Visual day-by-day cash out density</p>
+            </div>
+            <span class="badge badge-tag"><span class="pulse"></span> Active Window</span>
+          </div>
+          <div id="heatmap-container" style="overflow-x: auto; padding: var(--space-2) 0;">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/offline-sync.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/data-transfer.js"></script>
+  <script src="assets/js/reports.js"></script>
+</body>
+</html>
