@@ -30,8 +30,10 @@ from app.mvp import models as mvp_models
 
 target_metadata = Base.metadata
 
-from app.config import settings
-config.set_main_option("sqlalchemy.url", (settings.MIGRATION_DATABASE_URL or settings.DATABASE_URL).replace("%", "%%"))
+from app.config import settings, sqlalchemy_database_url
+if settings.production and not settings.MIGRATION_DATABASE_URL:
+    raise RuntimeError("Production migrations require MIGRATION_DATABASE_URL")
+config.set_main_option("sqlalchemy.url", sqlalchemy_database_url(settings.MIGRATION_DATABASE_URL or settings.DATABASE_URL).replace("%", "%%"))
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""

@@ -110,9 +110,9 @@ References: [OWASP session management](https://cheatsheetseries.owasp.org/cheats
 
 | Implemented locally | Still required before public release |
 |---|---|
-| One FastAPI origin serving `frontend/mvp` and `/api/v1`; old frontend assets and routes are not served | Validate the Blueprint with Render CLI and a real Render service. |
-| Argon2id, server-side sessions, `HttpOnly` cookies, CSRF and origin checks, no browser credential storage in the new UI | Configure production SMTP; exercise reset mail delivery and expired-token behavior. |
-| Owner-scoped accounts, categories, transactions, budgets, dashboard, CSV export and deletion | Test the migration and queries against disposable and production-like Neon branches, including rollback and restore. |
+| One FastAPI origin serving `frontend/mvp` and `/api/v1`; old frontend assets and routes are not served | Validate the free preview Blueprint with Render CLI and a real Render service. |
+| Argon2id, server-side sessions, `HttpOnly` cookies, CSRF and origin checks, no browser credential storage in the new UI | Password recovery is disabled in the free preview at the user's request; add and verify a recovery flow before public launch. |
+| Owner-scoped accounts, categories, transactions, budgets, dashboard, CSV export and deletion; Alembic and a production-mode API smoke passed on an isolated Neon branch and the new default branch with a limited runtime role | A restore drill and ongoing database monitoring remain before public release. |
 | Separate, expiring demo identities and sample data | Confirm cleanup and rate limits under production traffic. |
 | Responsive landing, onboarding, empty/populated dashboard, transaction entry | Complete mobile and keyboard browser review across all screens. |
 | SQLite migration and eleven backend tests pass locally; production dependency audit found no known vulnerabilities; local source scan found only a placeholder database URL in the legacy specification | Load check, Render health check and production monitoring remain. |
@@ -129,4 +129,6 @@ The old prototype files remain in the repository for reference but are outside t
 | D. Public experience | Landing, isolated demo, accessible charts and mobile layout. No placeholder controls. |
 | E. Launch hardening | Security controls above, reset/export/delete, backup restore test, error handling, performance check, README and deployment configuration updated. |
 
-**Ship gate:** all critical journeys pass browser smoke tests; financial calculations and two-user isolation pass automated tests; dependency and secret scans pass; migrations succeed on a fresh Neon branch and a production-like branch; no credential or financial data is cached in browser storage; Render health checks pass; demo cannot access private data; deployment and rollback are documented. Local implementation does not yet satisfy the external release checks.
+**Ship gate:** all critical journeys pass browser smoke tests; financial calculations and two-user isolation pass automated tests; dependency and secret scans pass; migrations succeed on a fresh Neon branch and a production-like branch; no credential or financial data is cached in browser storage; Render health checks pass; demo cannot access private data; deployment and rollback are documented. The free preview remains separate from this public launch gate.
+
+**Free preview deployment:** The checked-in Render Blueprint uses a Free web service in Singapore and disables automatic deploys. Render's Free plan has no pre-deploy command, so Alembic is run separately against a direct Neon URL after testing on a disposable branch. The web process receives only a pooled connection for a limited application role; it does not receive the schema owner's direct URL. Run and review each future migration before manually deploying. Password recovery is unavailable in this preview by user choice and is disclosed on the sign-in screen. This preview is not a production launch; the public ship gate above still applies.

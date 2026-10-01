@@ -4,7 +4,7 @@ from uuid import UUID
 
 import pytest
 
-from app.config import Settings
+from app.config import Settings, sqlalchemy_database_url
 from app.config import settings
 from app.mvp.models import Member, utcnow
 from .conftest import TestSession, csrf, register
@@ -57,6 +57,7 @@ def test_only_current_pages_are_served_with_private_cache_controls(client):
     assert "FinWise" in landing.text and "Pocket Clear" not in landing.text
     assert client.get("/assets/common.js").status_code == 200
     assert client.get("/dashboard.html").status_code == 404
+    assert client.get("/reset", follow_redirects=False).status_code == 303
     private_page = client.get("/app")
     assert private_page.headers["cache-control"] == "no-store"
     assert "default-src 'self'" in private_page.headers["content-security-policy"]
@@ -197,6 +198,7 @@ def test_expired_demo_is_removed_on_next_demo(client):
 
 
 def test_production_requires_secure_neon_connections_and_https():
+    assert sqlalchemy_database_url("postgresql://user:pass@host/db") == "postgresql+psycopg2://user:pass@host/db"
     configuration = Settings(
         APP_ENV="production", SESSION_SECRET="s" * 48,
         DATABASE_URL="postgresql+psycopg2://user:pass@ep-test-pooler.neon.tech/finwise?sslmode=require",
@@ -205,6 +207,13 @@ def test_production_requires_secure_neon_connections_and_https():
         SMTP_PASSWORD="password", MAIL_FROM="help@finwise.example",
     )
     configuration.validate_production()
+    configuration.MIGRATION_DATABASE_URL = None
+    configuration.SMTP_HOST = None
+    configuration.SMTP_USER = None
+    configuration.SMTP_PASSWORD = None
+    configuration.MAIL_FROM = None
+    configuration.validate_production()
+    configuration.MIGRATION_DATABASE_URL = "postgresql+psycopg2://user:pass@ep-test.neon.tech/finwise?sslmode=require"
     configuration.PUBLIC_ORIGIN = "http://finwise.example"
     with pytest.raises(RuntimeError, match="HTTPS"):
         configuration.validate_production()

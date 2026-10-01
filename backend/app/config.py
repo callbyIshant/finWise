@@ -4,6 +4,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
 
+def sqlalchemy_database_url(url: str) -> str:
+    """Use the installed driver for Neon's standard postgresql:// URLs."""
+    return url.replace("postgresql://", "postgresql+psycopg2://", 1) if url.startswith("postgresql://") else url
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -27,18 +32,21 @@ class Settings(BaseSettings):
             return
         if len(self.SESSION_SECRET) < 32 or self.SESSION_SECRET.startswith("local-development"):
             raise RuntimeError("SESSION_SECRET must be a strong production secret")
-        if not self.DATABASE_URL.startswith("postgresql") or not self.MIGRATION_DATABASE_URL:
-            raise RuntimeError("Production requires pooled and direct PostgreSQL URLs")
+        if not self.DATABASE_URL.startswith("postgresql"):
+            raise RuntimeError("Production requires a pooled PostgreSQL URL")
         runtime_url = make_url(self.DATABASE_URL)
-        migration_url = make_url(self.MIGRATION_DATABASE_URL)
-        if runtime_url.query.get("sslmode") != "require" or migration_url.query.get("sslmode") != "require":
+        if runtime_url.query.get("sslmode") != "require":
             raise RuntimeError("Neon connections must require TLS")
-        if "-pooler" not in (runtime_url.host or "") or "-pooler" in (migration_url.host or ""):
-            raise RuntimeError("Use pooled Neon URL for requests and direct URL for migrations")
+        if "-pooler" not in (runtime_url.host or ""):
+            raise RuntimeError("Use the pooled Neon URL for requests")
+        if self.MIGRATION_DATABASE_URL:
+            migration_url = make_url(self.MIGRATION_DATABASE_URL)
+            if migration_url.query.get("sslmode") != "require":
+                raise RuntimeError("Neon connections must require TLS")
+            if "-pooler" in (migration_url.host or ""):
+                raise RuntimeError("Use the direct Neon URL for migrations")
         if not self.PUBLIC_ORIGIN.startswith("https://"):
             raise RuntimeError("PUBLIC_ORIGIN must use HTTPS in production")
-        if not all((self.SMTP_HOST, self.SMTP_USER, self.SMTP_PASSWORD, self.MAIL_FROM)):
-            raise RuntimeError("Production requires password-reset email configuration")
 
 
 @lru_cache

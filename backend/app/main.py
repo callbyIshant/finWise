@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -93,6 +93,8 @@ def login_page():
 
 @app.get("/reset")
 def reset_page():
+    if not all((settings.SMTP_HOST, settings.SMTP_USER, settings.SMTP_PASSWORD, settings.MAIL_FROM)):
+        return RedirectResponse("/login", status_code=303)
     return FileResponse(FRONTEND / "reset.html")
 
 

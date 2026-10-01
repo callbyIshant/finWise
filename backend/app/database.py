@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-from .config import settings
+from .config import settings, sqlalchemy_database_url
 
 
 class Base(DeclarativeBase):
@@ -10,7 +10,7 @@ class Base(DeclarativeBase):
 
 connect_args = {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(
-    settings.DATABASE_URL,
+    sqlalchemy_database_url(settings.DATABASE_URL),
     connect_args=connect_args,
     pool_pre_ping=True,
     **({"pool_size": 3, "max_overflow": 2} if not connect_args else {}),
