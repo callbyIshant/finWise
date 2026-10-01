@@ -48,16 +48,16 @@ flowchart LR
   R --> UI[Static HTML/CSS/JS]
   R --> API[FastAPI routers and domain services]
   API -->|pooled TLS connection| N[(Neon Postgres)]
-  M[Alembic pre-deploy migration] -->|direct TLS connection| N
+  M[Alembic migration run separately] -->|direct TLS connection| N
 ```
 
 The API is a modular monolith. Routers handle HTTP and validation; services implement transaction, budget, and reporting rules; repositories/queries persist data. The frontend never connects to Neon. No Redis, worker, scheduler, object store, or separate frontend hosting is required in the MVP.
 
-**Render target:** the root `render.yaml` defines one `runtime: python` web service on the smallest paid compute plan, a build step that installs backend dependencies, a pre-deploy Alembic migration step, a start command binding `0.0.0.0:$PORT`, a health endpoint, and explicit environment variables. Render's pre-deploy command is available only to paid web services. The Python app serves only `frontend/mvp` from a fixed directory. Production startup requires secure settings. Automatic deployment remains off until the release gates pass.
+**Render target:** the root `render.yaml` defines one `runtime: python` web service on the Free plan, a build step that installs backend dependencies, a start command binding `0.0.0.0:$PORT`, a health endpoint, and explicit environment variables. The live service was created directly in Render and must be updated explicitly if the Blueprint changes. Render's pre-deploy command is available only to paid web services, so migrations run separately before manual deployment. The Python app serves only `frontend/mvp` from a fixed directory. Production startup requires secure settings. Automatic deployment is off.
 
-**Environment contract:** `DATABASE_URL` is Neon's pooled connection string for web requests; `MIGRATION_DATABASE_URL` is the direct string for Alembic; `SESSION_SECRET` is a high-entropy Render secret; `APP_ENV=production` enables secure defaults; `PUBLIC_ORIGIN` is the canonical HTTPS site URL. Store these in Render secret environment variables, never in YAML or client code. Keep development and production on separate Neon branches with separate credentials. Test migrations on a disposable branch before production. Set a small SQLAlchemy application pool and `pool_pre_ping` to handle idle connections; cap total connections according to the chosen Neon plan.
+**Environment contract:** `DATABASE_URL` is Neon's pooled connection string for web requests, using the limited `finwise_app` role; `MIGRATION_DATABASE_URL` is the direct schema-owner string used only by the separate Alembic process and is absent from Render; `SESSION_SECRET` is a high-entropy Render secret; `APP_ENV=production` enables secure defaults; `PUBLIC_ORIGIN` is `https://finwise-c2rb.onrender.com`. Store runtime secrets in Render environment variables, never in YAML or client code. Keep migration checks on a disposable Neon branch. Set a small SQLAlchemy application pool and `pool_pre_ping` to handle idle connections; cap total connections according to the chosen Neon plan.
 
-Password-reset mail uses a small transactional-email adapter with credentials held in Render. Select and configure the provider before opening public registration; email delivery is not a web-process background job.
+Password recovery is disabled for this free preview at the user's request. The sign-in screen discloses this limitation. Add and verify a recovery flow before public launch.
 
 ## 4. Data and financial rules
 
@@ -110,12 +110,12 @@ References: [OWASP session management](https://cheatsheetseries.owasp.org/cheats
 
 | Implemented locally | Still required before public release |
 |---|---|
-| One FastAPI origin serving `frontend/mvp` and `/api/v1`; old frontend assets and routes are not served | Validate the free preview Blueprint with Render CLI and a real Render service. |
+| One FastAPI origin serving `frontend/mvp` and `/api/v1`; old frontend assets and routes are not served; the Render Free service is live and `/health` returns 200 | Keep `render.yaml` and the directly created Render service in sync; validate the Blueprint before applying future changes. |
 | Argon2id, server-side sessions, `HttpOnly` cookies, CSRF and origin checks, no browser credential storage in the new UI | Password recovery is disabled in the free preview at the user's request; add and verify a recovery flow before public launch. |
 | Owner-scoped accounts, categories, transactions, budgets, dashboard, CSV export and deletion; Alembic and a production-mode API smoke passed on an isolated Neon branch and the new default branch with a limited runtime role | A restore drill and ongoing database monitoring remain before public release. |
 | Separate, expiring demo identities and sample data | Confirm cleanup and rate limits under production traffic. |
 | Responsive landing, onboarding, empty/populated dashboard, transaction entry | Complete mobile and keyboard browser review across all screens. |
-| SQLite migration and eleven backend tests pass locally; production dependency audit found no known vulnerabilities; local source scan found only a placeholder database URL in the legacy specification | Load check, Render health check and production monitoring remain. |
+| SQLite migration and eleven backend tests pass locally; production dependency audit found no known vulnerabilities; local source scan found only a placeholder database URL in the legacy specification; live demo writes updated the dashboard | Load check and production monitoring remain before public launch. |
 
 The old prototype files remain in the repository for reference but are outside the served `frontend/mvp` directory and are not imported by `app.main`. The legacy Alembic 001 schema remains intact; migration 002 adds separate MVP tables so old records are not silently destroyed. Migration of any real legacy user data needs a separate reviewed plan.
 
@@ -131,4 +131,4 @@ The old prototype files remain in the repository for reference but are outside t
 
 **Ship gate:** all critical journeys pass browser smoke tests; financial calculations and two-user isolation pass automated tests; dependency and secret scans pass; migrations succeed on a fresh Neon branch and a production-like branch; no credential or financial data is cached in browser storage; Render health checks pass; demo cannot access private data; deployment and rollback are documented. The free preview remains separate from this public launch gate.
 
-**Free preview deployment:** The checked-in Render Blueprint uses a Free web service in Singapore and disables automatic deploys. Render's Free plan has no pre-deploy command, so Alembic is run separately against a direct Neon URL after testing on a disposable branch. The web process receives only a pooled connection for a limited application role; it does not receive the schema owner's direct URL. Run and review each future migration before manually deploying. Password recovery is unavailable in this preview by user choice and is disclosed on the sign-in screen. This preview is not a production launch; the public ship gate above still applies.
+**Free preview deployment:** [FinWise](https://finwise-c2rb.onrender.com) is live on a Render Free web service in Singapore, deployed from commit `030f5a6`. The checked-in Blueprint records the intended configuration, but this service was created directly in Render. Automatic deploys are off. Render's Free plan has no pre-deploy command, so Alembic is run separately against a direct Neon URL after testing on a disposable branch. The web process receives only a pooled connection for a limited application role; it does not receive the schema owner's direct URL. Run and review each future migration before manually deploying. Password recovery is unavailable in this preview by user choice and is disclosed on the sign-in screen. This preview is not a production launch; the public ship gate above still applies.

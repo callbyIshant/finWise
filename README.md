@@ -37,7 +37,7 @@ pytest -q
 
 ## Production configuration
 
-The [`render.yaml`](render.yaml) Blueprint defines one Python web service on Render's Free plan in Singapore for a preview. [Render reserves pre-deploy commands for paid web services](https://render.com/docs/deploys). Test each migration on a disposable Neon branch, then run it separately against the default branch before manually deploying the web service. Automatic deploys are off. The schema owner's direct URL stays outside Render. Set these variables in the Render Dashboard before deploying:
+The [live free preview](https://finwise-c2rb.onrender.com) runs as one Python web service on Render in Singapore. Its configuration is captured in [`render.yaml`](render.yaml); the current service was created directly in Render, so future Blueprint changes must be applied to the service explicitly. [Render reserves pre-deploy commands for paid web services](https://render.com/docs/deploys). Test each migration on a disposable Neon branch, then run it separately against the default branch before manually deploying the web service. Automatic deploys are off. The schema owner's direct URL stays outside Render. The service uses these variables:
 
 | Variable | Purpose |
 |---|---|
@@ -47,7 +47,7 @@ The [`render.yaml`](render.yaml) Blueprint defines one Python web service on Ren
 
 `APP_ENV=production` rejects startup if required security settings are missing. Password reset is unavailable in this preview, as requested; the sign-in page states this and `/reset` returns to sign-in. Account holders must retain their passwords. A public release needs a reviewed recovery flow. [Render Free is intended for previews rather than production](https://render.com/docs/free). Use separate Neon branches and credentials for migration checks. The Render runtime role should have only the data permissions it needs. See [Render's Blueprint reference](https://render.com/docs/blueprint-spec) and [Neon's pooling guidance](https://neon.com/docs/connect/connection-pooling).
 
-The FinWise Neon project is `nameless-base-81278398` in Singapore. Migrations passed on an isolated branch and the default branch; a production-mode API smoke test passed with a limited runtime role and deleted its test data. Render deployment and the public release gates remain. Keep the direct migration URL and all passwords out of Git and Render's runtime environment.
+The FinWise Neon project is `nameless-base-81278398` in Singapore. Migrations passed on an isolated branch and the default branch; a production-mode API smoke test passed with a limited runtime role and deleted its test data. Render deployed commit `030f5a6` successfully. The public release gates remain. Keep the direct migration URL and all passwords out of Git and Render's runtime environment.
 
 ## Core API
 
